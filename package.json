@@ -1,0 +1,126 @@
+{
+  "name": "oh-my-pi-vscode",
+  "displayName": "Oh My Pi for VS Code",
+  "description": "Oh My Pi for VS Code — embedded terminal panel that runs omp in a dedicated sidebar (desktop only).",
+  "version": "0.4.0",
+  "publisher": "oh-my-pi",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oh-my-pi/oh-my-pi-vscode"
+  },
+  "extensionKind": ["ui"],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onView:ohMyPi.terminal",
+    "onCommand:ohMyPi.open",
+    "onCommand:ohMyPi.restart",
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "oh-my-pi",
+          "title": "Oh My Pi",
+          "icon": "media/activity-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "oh-my-pi": [
+        {
+          "type": "webview",
+          "id": "ohMyPi.terminal",
+          "name": "Terminal",
+          "icon": "media/activity-icon.svg",
+          "contextualTitle": "Oh My Pi for VS Code"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "ohMyPi.open",
+        "title": "Oh My Pi for VS Code: Open Terminal",
+        "category": "Oh My Pi for VS Code",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "ohMyPi.restart",
+        "title": "Oh My Pi for VS Code: Restart Terminal",
+        "category": "Oh My Pi for VS Code",
+        "icon": "$(debug-restart)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "ohMyPi.restart",
+          "when": "view == ohMyPi.terminal",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "ohMyPi.open"
+        },
+        {
+          "command": "ohMyPi.restart"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Oh My Pi for VS Code",
+      "properties": {
+        "ohMyPi.executablePath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Command to run in the embedded terminal. Defaults to `omp`. Use a full path if `omp` is not on VS Code's PATH (e.g. `~/.bun/bin/omp`). Shell arguments are supported (e.g. `omp --flag`)."
+        },
+        "ohMyPi.autoStart": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically open the Oh My Pi for VS Code panel when VS Code starts."
+        },
+        "ohMyPi.workingDirectory": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Working directory for omp (defaults to the first workspace folder, or your home directory)."
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "ohMyPi.open",
+        "key": "ctrl+shift+alt+i",
+        "mac": "cmd+shift+alt+i"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.mjs --production",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test test/*.test.ts",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "@lydell/node-pty": "^1.1.0",
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/addon-webgl": "^0.19.0",
+    "@xterm/xterm": "^5.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.7.1",
+    "esbuild": "^0.24.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
