@@ -3,6 +3,7 @@ node_modules/**
 !node_modules/@lydell/**
 !node_modules/@xterm/**
 src/**
+scripts/**
 esbuild.mjs
 tsconfig*.json
 .gitignore

@@ -61,7 +61,8 @@ npm run build      # production build
 npm run watch      # watch mode
 npm run typecheck  # TypeScript check
 npm test           # unit tests
-npm run package    # create .vsix
+npm run package    # create .vsix for the current platform
+npm run package:all # create one .vsix per platform (macOS/Linux/Windows × x64/arm64)
 ```
 
 Press **F5** in VS Code to launch an Extension Development Host.

@@ -2,12 +2,13 @@
   "name": "oh-my-pi-vscode",
   "displayName": "Oh My Pi for VS Code",
   "description": "Oh My Pi for VS Code — embedded terminal panel that runs omp in a dedicated sidebar (desktop only).",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "publisher": "oh-my-pi",
+  "icon": "oh-my-pi-vscode-logo.png",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/oh-my-pi/oh-my-pi-vscode"
+    "url": "https://github.com/shohihul/oh-my-pi-vscode"
   },
   "extensionKind": ["ui"],
   "engines": {
@@ -15,6 +16,15 @@
   },
   "categories": ["Other"],
   "main": "./dist/extension.js",
+  "keywords": [
+    "terminal",
+    "omp",
+    "oh-my-pi",
+    "pty",
+    "xterm",
+    "sidebar",
+    "ai"
+  ],
   "activationEvents": [
     "onView:ohMyPi.terminal",
     "onCommand:ohMyPi.open",
@@ -107,7 +117,8 @@
     "watch": "node esbuild.mjs --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "tsx --test test/*.test.ts",
-    "package": "vsce package"
+    "package": "vsce package",
+    "package:all": "node scripts/package-all.mjs"
   },
   "dependencies": {
     "@lydell/node-pty": "^1.1.0",
