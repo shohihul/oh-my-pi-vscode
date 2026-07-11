@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 
-import { shouldAutoStart } from "./config";
 import { TerminalViewProvider } from "./terminal/TerminalViewProvider";
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -19,7 +18,7 @@ export function activate(context: vscode.ExtensionContext): void {
     provider,
   );
 
-  if (shouldAutoStart()) {
+  if (vscode.workspace.getConfiguration("ohMyPi").get<boolean>("autoStart", false)) {
     provider.reveal();
   }
 }

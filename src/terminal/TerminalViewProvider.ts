@@ -2,7 +2,6 @@ import * as vscode from "vscode";
 
 import {
   getExecutable,
-  getTerminalAppearance,
   getTerminalFont,
   resolveWorkingDirectory,
 } from "../config";
@@ -119,7 +118,7 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
   }
 
   #setWebviewHtml(webview: vscode.Webview): void {
-    const result = buildTerminalHtml(this.extensionUri.fsPath, getTerminalAppearance());
+    const result = buildTerminalHtml(this.extensionUri.fsPath, getTerminalFont());
     webview.html = result.html;
 
     if (!result.ok) {

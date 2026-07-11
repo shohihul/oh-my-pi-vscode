@@ -5,15 +5,11 @@ import path from "node:path";
 import { DEFAULT_TERMINAL_FONT } from "../src/appearance";
 import { buildTerminalHtml, clearAssetCache } from "../src/terminal/terminalHtml";
 
-const appearance = {
-  font: DEFAULT_TERMINAL_FONT,
-};
-
 describe("buildTerminalHtml", () => {
   it("returns ok html when assets exist", () => {
     clearAssetCache();
     const extensionPath = path.resolve(import.meta.dirname, "..");
-    const result = buildTerminalHtml(extensionPath, appearance);
+    const result = buildTerminalHtml(extensionPath, DEFAULT_TERMINAL_FONT);
 
     assert.equal(result.ok, true);
     if (result.ok) {
@@ -27,7 +23,7 @@ describe("buildTerminalHtml", () => {
 
   it("returns error html when assets are missing", () => {
     clearAssetCache();
-    const result = buildTerminalHtml("/nonexistent/path", appearance);
+    const result = buildTerminalHtml("/nonexistent/path", DEFAULT_TERMINAL_FONT);
 
     assert.equal(result.ok, false);
     assert.match(result.html, /Failed to load terminal assets/);

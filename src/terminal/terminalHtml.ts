@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import type { TerminalAppearance } from "../appearance";
+import type { TerminalFont } from "../appearance";
 import { themeReaderScript } from "../theme/xtermTheme";
 
 type XtermAssets = {
@@ -48,7 +48,7 @@ export type TerminalHtmlResult =
 
 export function buildTerminalHtml(
   extensionPath: string,
-  appearance: TerminalAppearance,
+  font: TerminalFont,
 ): TerminalHtmlResult {
   let assets: XtermAssets;
   try {
@@ -66,7 +66,7 @@ export function buildTerminalHtml(
 
   return {
     ok: true,
-    html: buildTerminalHtmlInner(assets, nonce, appearance.font),
+    html: buildTerminalHtmlInner(assets, nonce, font),
   };
 }
 
