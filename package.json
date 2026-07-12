@@ -3,7 +3,7 @@
   "displayName": "Oh My Pi for VS Code",
   "description": "Oh My Pi for VS Code — embedded terminal panel that runs omp in a dedicated sidebar (desktop only).",
   "version": "1.0.0",
-  "publisher": "oh-my-pi",
+  "publisher": "shohihulmaksud",
   "icon": "oh-my-pi-vscode-logo.png",
   "license": "MIT",
   "repository": {

@@ -191,17 +191,10 @@ function buildTerminalHtmlInner(
       vscode.postMessage({ type: 'input', data });
     });
 
-    document.addEventListener('paste', (e) => {
-      e.preventDefault();
-      pasteText(e.clipboardData?.getData('text') ?? '');
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'v' && !e.shiftKey) {
-        e.preventDefault();
-        navigator.clipboard.readText().then(pasteText).catch(() => {});
-      }
-    });
+    // Paste via keyboard (Cmd/Ctrl+V) and right-click context menu is handled
+    // natively by xterm.js — its paste handler reads clipboardData and calls
+    // stopPropagation, so a document-level handler is redundant and causes
+    // double-paste. Middle-click paste is handled in the mousedown listener below.
 
     container.addEventListener('auxclick', (e) => {
       if (e.button === 1) e.preventDefault();
