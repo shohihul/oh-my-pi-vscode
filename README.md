@@ -1,6 +1,6 @@
 # Oh My Pi for VS Code
 
-Embedded terminal panel for [Oh My Pi](https://github.com/oh-my-pi/oh-my-pi). Runs `omp` in a dedicated sidebar terminal powered by xterm.js and a real pseudo-terminal (PTY).
+Embedded terminal panel for [Oh My Pi](https://github.com/can1357/oh-my-pi). Runs `omp` in a dedicated sidebar terminal powered by xterm.js and a real pseudo-terminal (PTY).
 
 This extension does **not** use VS Code's built-in terminal panel. It renders its own terminal inside a webview.
 
