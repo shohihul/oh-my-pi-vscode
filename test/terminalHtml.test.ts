@@ -14,6 +14,8 @@ describe("buildTerminalHtml", () => {
     assert.equal(result.ok, true);
     if (result.ok) {
       assert.match(result.html, /xterm/);
+      assert.match(result.html, /SearchAddon/);
+      assert.match(result.html, /search-bar/);
       assert.match(result.html, /readXtermTheme/);
       assert.match(result.html, /applyTheme/);
       assert.match(result.html, /vscode-terminal-background/);

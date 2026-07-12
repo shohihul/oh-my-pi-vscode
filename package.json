@@ -2,7 +2,7 @@
   "name": "oh-my-pi-vscode",
   "displayName": "Oh My Pi for VS Code",
   "description": "Oh My Pi for VS Code — embedded terminal panel that runs omp in a dedicated sidebar (desktop only).",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "publisher": "shohihulmaksud",
   "icon": "oh-my-pi-vscode-logo.png",
   "license": "MIT",
@@ -68,10 +68,21 @@
         "title": "Oh My Pi for VS Code: Restart Terminal",
         "category": "Oh My Pi for VS Code",
         "icon": "$(debug-restart)"
+      },
+      {
+        "command": "ohMyPi.search",
+        "title": "Oh My Pi for VS Code: Find in Terminal",
+        "category": "Oh My Pi for VS Code",
+        "icon": "$(search)"
       }
     ],
     "menus": {
       "view/title": [
+        {
+          "command": "ohMyPi.search",
+          "when": "view == ohMyPi.terminal",
+          "group": "navigation"
+        },
         {
           "command": "ohMyPi.restart",
           "when": "view == ohMyPi.terminal",
@@ -84,6 +95,9 @@
         },
         {
           "command": "ohMyPi.restart"
+        },
+        {
+          "command": "ohMyPi.search"
         }
       ]
     },
@@ -112,6 +126,12 @@
         "command": "ohMyPi.open",
         "key": "ctrl+shift+alt+i",
         "mac": "cmd+shift+alt+i"
+      },
+      {
+        "command": "ohMyPi.search",
+        "key": "ctrl+f",
+        "mac": "cmd+f",
+        "when": "view == ohMyPi.terminal"
       }
     ]
   },
@@ -127,6 +147,7 @@
   "dependencies": {
     "@lydell/node-pty": "^1.1.0",
     "@xterm/addon-fit": "^0.10.0",
+    "@xterm/addon-search": "^0.16.0",
     "@xterm/addon-webgl": "^0.19.0",
     "@xterm/xterm": "^5.5.0"
   },

@@ -9,6 +9,7 @@ type XtermAssets = {
   xtermCss: string;
   fitJs: string;
   webglJs: string;
+  searchJs: string;
 };
 
 let cachedAssets: XtermAssets | undefined;
@@ -17,12 +18,12 @@ function loadAssets(extensionPath: string): XtermAssets {
   if (!cachedAssets) {
     const read = (...parts: string[]) =>
       fs.readFileSync(path.join(extensionPath, "node_modules", ...parts), "utf8");
-
     cachedAssets = {
       xtermJs: read("@xterm", "xterm", "lib", "xterm.js"),
       xtermCss: read("@xterm", "xterm", "css", "xterm.css"),
       fitJs: read("@xterm", "addon-fit", "lib", "addon-fit.js"),
       webglJs: read("@xterm", "addon-webgl", "lib", "addon-webgl.js"),
+      searchJs: read("@xterm", "addon-search", "lib", "addon-search.js"),
     };
   }
   return cachedAssets;
@@ -120,18 +121,87 @@ function buildTerminalHtmlInner(
       inset: 0;
       padding: 4px;
     }
+    #search-bar {
+      position: absolute;
+      top: 8px;
+      right: 14px;
+      z-index: 10;
+      display: flex;
+      gap: 3px;
+      align-items: center;
+      padding: 4px 6px;
+      border-radius: 4px;
+      background: var(--vscode-editorWidget-background, #252526);
+      border: 1px solid var(--vscode-widget-border, #454545);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    #search-bar.hidden { display: none; }
+    #search-bar input {
+      width: 200px;
+      padding: 3px 6px;
+      border: 1px solid var(--vscode-input-border, transparent);
+      border-radius: 2px;
+      background: var(--vscode-input-background, #3c3c3c);
+      color: var(--vscode-input-foreground, #cccccc);
+      font-size: 12px;
+      outline: none;
+    }
+    #search-bar input:focus {
+      border-color: var(--vscode-focusBorder, #007fd4);
+    }
+    #search-bar button {
+      min-width: 22px;
+      height: 22px;
+      padding: 0 4px;
+      border: none;
+      border-radius: 3px;
+      background: transparent;
+      color: var(--vscode-foreground, #cccccc);
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #search-bar button:hover {
+      background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
+    }
+    #search-bar button.active {
+      background: var(--vscode-button-background, #0e639c);
+      color: var(--vscode-button-foreground, #ffffff);
+    }
+    #search-bar button.active:hover {
+      background: var(--vscode-button-hoverBackground, #1177bb);
+    }
+    #search-results {
+      min-width: 56px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--vscode-descriptionForeground, #9d9d9d);
+    }
   </style>
 </head>
 <body>
   <div id="terminal-container"></div>
+  <div id="search-bar" class="hidden">
+    <input id="search-input" type="text" placeholder="Find" spellcheck="false" autocomplete="off" />
+    <span id="search-results" aria-live="polite"></span>
+    <button id="search-case" type="button" title="Match Case (Alt+C)" aria-label="Match Case">Aa</button>
+    <button id="search-word" type="button" title="Match Whole Word (Alt+W)" aria-label="Match Whole Word">&#9109;</button>
+    <button id="search-regex" type="button" title="Use Regular Expression (Alt+R)" aria-label="Use Regular Expression">.*</button>
+    <button id="search-prev" type="button" title="Previous (Shift+Enter)" aria-label="Previous">&#9650;</button>
+    <button id="search-next" type="button" title="Next (Enter)" aria-label="Next">&#9660;</button>
+    <button id="search-close" type="button" title="Close (Escape)" aria-label="Close">&#10005;</button>
+  </div>
   <script nonce="${nonce}">${assets.xtermJs}</script>
   <script nonce="${nonce}">${assets.fitJs}</script>
-  <script nonce="${nonce}">${assets.webglJs}</script>
+  <script nonce="${nonce}">${assets.searchJs}</script>
   <script nonce="${nonce}">
     const vscode = acquireVsCodeApi();
     const container = document.getElementById('terminal-container');
 
     const term = new Terminal({
+      allowProposedApi: true,
       cursorBlink: true,
       fontSize: ${font.size},
       fontFamily: ${JSON.stringify(font.family)},
@@ -151,6 +221,132 @@ function buildTerminalHtmlInner(
     } catch (_) {}
 
     applyTheme();
+    const searchAddon = new SearchAddon.SearchAddon();
+    term.loadAddon(searchAddon);
+
+    const searchBar = document.getElementById('search-bar');
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    const btnCase = document.getElementById('search-case');
+    const btnWord = document.getElementById('search-word');
+    const btnRegex = document.getElementById('search-regex');
+    const btnPrev = document.getElementById('search-prev');
+    const btnNext = document.getElementById('search-next');
+    const btnClose = document.getElementById('search-close');
+
+    let caseSensitive = false;
+    let wholeWord = false;
+    let useRegex = false;
+    function resolveColor(cssVar, fallback) {
+      try {
+        const v = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
+        return v || fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function searchOptions() {
+      return {
+        caseSensitive,
+        wholeWord,
+        regex: useRegex,
+        decorations: {
+          matchBackground: resolveColor('--vscode-editor-findMatchHighlightBackground', 'rgba(234, 92, 0, 0.44)'),
+          activeMatchBackground: resolveColor('--vscode-editor-findMatchBackground', 'rgba(234, 92, 0, 0.7)'),
+          matchOverviewRuler: resolveColor('--vscode-editorOverviewRuler-findMatchForeground', '#d13636'),
+          activeMatchColorOverviewRuler: resolveColor('--vscode-editorOverviewRuler-selectionHighlightForeground', '#d13636'),
+        },
+      };
+    }
+
+    function find(direction) {
+      const query = searchInput.value;
+      if (!query) {
+        searchResults.textContent = '';
+        searchAddon.clearDecorations();
+        return;
+      }
+      try {
+        if (direction === 'prev') {
+          searchAddon.findPrevious(query, searchOptions());
+        } else {
+          searchAddon.findNext(query, searchOptions());
+        }
+      } catch {
+        // Invalid regex or search error — clear decorations silently.
+        searchAddon.clearDecorations();
+      }
+    }
+
+    searchAddon.onDidChangeResults((results) => {
+      if (results && results.resultCount > 0) {
+        searchResults.textContent = (results.resultIndex + 1) + '/' + results.resultCount;
+      } else {
+        searchResults.textContent = '';
+      }
+    });
+
+    function openSearch() {
+      searchBar.classList.remove('hidden');
+      searchInput.focus();
+      searchInput.select();
+    }
+
+    function closeSearch() {
+      searchBar.classList.add('hidden');
+      searchInput.value = '';
+      searchResults.textContent = '';
+      searchAddon.clearDecorations();
+      term.focus();
+    }
+
+    function toggleButton(btn, getValue, setValue) {
+      const next = !getValue();
+      setValue(next);
+      if (next) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+      find('next');
+    }
+
+    btnCase.addEventListener('click', () => toggleButton(btnCase, () => caseSensitive, (v) => { caseSensitive = v; }));
+    btnWord.addEventListener('click', () => toggleButton(btnWord, () => wholeWord, (v) => { wholeWord = v; }));
+    btnRegex.addEventListener('click', () => toggleButton(btnRegex, () => useRegex, (v) => { useRegex = v; }));
+    btnPrev.addEventListener('click', () => find('prev'));
+    btnNext.addEventListener('click', () => find('next'));
+    btnClose.addEventListener('click', closeSearch);
+
+    searchInput.addEventListener('input', () => find('next'));
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        find(e.shiftKey ? 'prev' : 'next');
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        closeSearch();
+      }
+      e.stopPropagation();
+    });
+
+    // Ctrl/Cmd+F opens search directly in the webview. The VS Code keybinding
+    // (when: view == ohMyPi.terminal) does not fire while focus is inside the
+    // webview's xterm textarea, so intercept the keystroke here on capture
+    // phase, before xterm can forward it to the pty.
+    document.addEventListener('keydown', (e) => {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+      if (e.key !== 'f' && e.key !== 'F') return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (searchBar.classList.contains('hidden')) {
+        openSearch();
+      } else {
+        searchInput.focus();
+        searchInput.select();
+      }
+    }, true);
 
     let ready = false;
     let exited = false;
@@ -226,6 +422,8 @@ function buildTerminalHtmlInner(
         term.options.fontSize = msg.size;
         term.options.fontFamily = msg.family;
         fitAndNotify();
+      } else if (msg.type === 'search') {
+        openSearch();
       }
     });
 
