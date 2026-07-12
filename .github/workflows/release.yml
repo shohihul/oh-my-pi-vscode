@@ -78,7 +78,7 @@ jobs:
           echo "Publishing $(ls -1 oh-my-pi-vscode-*.vsix | wc -l) VSIX packages…"
           for f in oh-my-pi-vscode-*.vsix; do
             echo "::group::Publishing $f"
-            vsce publish -i "$f" --skip-duplicate
+            npx vsce publish -i "$f" --skip-duplicate
             echo "::endgroup::"
           done
 
