@@ -2,7 +2,7 @@
   "name": "oh-my-pi-vscode",
   "displayName": "Oh My Pi for VS Code",
   "description": "Oh My Pi for VS Code — embedded terminal panel that runs omp in a dedicated sidebar (desktop only).",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "shohihulmaksud",
   "icon": "oh-my-pi-vscode-logo.png",
   "license": "MIT",
@@ -10,11 +10,15 @@
     "type": "git",
     "url": "https://github.com/shohihul/oh-my-pi-vscode"
   },
-  "extensionKind": ["ui"],
+  "extensionKind": [
+    "ui"
+  ],
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "main": "./dist/extension.js",
   "keywords": [
     "terminal",
