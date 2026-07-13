@@ -33,6 +33,9 @@
     "onView:ohMyPi.terminal",
     "onCommand:ohMyPi.open",
     "onCommand:ohMyPi.restart",
+    "onCommand:ohMyPi.sendLines",
+    "onCommand:ohMyPi.sendSelection",
+    "onCommand:ohMyPi.sendFile",
     "onStartupFinished"
   ],
   "contributes": {
@@ -74,6 +77,24 @@
         "title": "Oh My Pi for VS Code: Find in Terminal",
         "category": "Oh My Pi for VS Code",
         "icon": "$(search)"
+      },
+      {
+        "command": "ohMyPi.sendLines",
+        "title": "OMP: Send Line(s) to omp",
+        "category": "Oh My Pi for VS Code",
+        "icon": "$(code)"
+      },
+      {
+        "command": "ohMyPi.sendSelection",
+        "title": "OMP: Send Selection to omp",
+        "category": "Oh My Pi for VS Code",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "ohMyPi.sendFile",
+        "title": "OMP: Send File Path to omp",
+        "category": "Oh My Pi for VS Code",
+        "icon": "$(file)"
       }
     ],
     "menus": {
@@ -89,6 +110,23 @@
           "group": "navigation"
         }
       ],
+      "editor/context": [
+        {
+          "command": "ohMyPi.sendLines",
+          "when": "editorTextFocus",
+          "group": "9_omp@1"
+        },
+        {
+          "command": "ohMyPi.sendSelection",
+          "when": "editorTextFocus",
+          "group": "9_omp@2"
+        },
+        {
+          "command": "ohMyPi.sendFile",
+          "when": "resourceScheme == file",
+          "group": "9_omp@3"
+        }
+      ],
       "commandPalette": [
         {
           "command": "ohMyPi.open"
@@ -98,6 +136,16 @@
         },
         {
           "command": "ohMyPi.search"
+        },
+        {
+          "command": "ohMyPi.sendLines"
+        },
+        {
+          "command": "ohMyPi.sendSelection"
+        },
+        {
+          "command": "ohMyPi.sendFile",
+          "when": "resourceScheme == file"
         }
       ]
     },

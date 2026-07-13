@@ -20,6 +20,7 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
   #exited = false;
   #viewDisposables: vscode.Disposable[] = [];
   #globalDisposables: vscode.Disposable[] = [];
+  #pendingSend: string | undefined;
 
   constructor(private readonly extensionUri: vscode.Uri) {
     this.#globalDisposables.push(
@@ -110,6 +111,23 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
   search(): void {
     this.#view?.webview.postMessage({ type: "search" });
   }
+  
+  send(data: string): void {
+    if (!data) {
+      return;
+    }
+    if (!this.#view) {
+      // Panel not yet open — queue and reveal. #ensurePty() flushes after spawn.
+      this.#pendingSend = data;
+      this.reveal();
+      return;
+    }
+    if (this.#exited) {
+      this.#restart();
+    }
+    this.#ensurePty();
+    this.#writeInput(data);
+  }
 
   dispose(): void {
     this.#clearViewDisposables();
@@ -183,6 +201,12 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
         type: "data",
         data: `\r\n\x1b[31mFailed to start omp: ${message}\x1b[0m\r\n`,
       });
+    }
+
+    const pending = this.#pendingSend;
+    this.#pendingSend = undefined;
+    if (pending !== undefined && this.#spawned && !this.#exited) {
+      this.#writeInput(pending);
     }
   }
 

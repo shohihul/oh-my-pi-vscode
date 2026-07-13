@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Find in Terminal** — search the terminal scrollback with a webview search bar: type-ahead matching, next/previous navigation (`Enter` / `Shift+Enter`), and a live match counter (`N/M`). Toggles for **Match Case**, **Match Whole Word**, and **Regular Expression**.
 - Match highlighting and the active-result counter powered by `@xterm/addon-search`, with colors resolved live from the active VS Code theme (`--vscode-editor-findMatch*` variables).
 - Open search via `Cmd/Ctrl+F` (intercepted inside the terminal so the keystroke never leaks to the shell), the **Find in Terminal** command, the search toolbar icon, or the command palette. Close with `Escape`.
+- **Send Line(s) to omp** — sends a line reference to the embedded terminal and presses Enter: `path/to/file:42` for a single line, or `path/to/file:20-25` for a selection. Paths are relative to the workspace and line numbers match the editor.
+- **Send Selection to omp** — sends the exact selected text (or the active line if nothing is selected) to the terminal, with no trailing newline.
+- **Send File Path to omp** — sends the file path relative to the workspace and presses Enter.
+- All three are reachable from the editor right-click menu and the Command Palette.
 
 ### Fixed
 
@@ -39,5 +43,7 @@ First stable release.
 - Auto-restart on exit (press any key); automatic restart when `executablePath` or `workingDirectory` changes.
 - Paste via `Cmd/Ctrl+V` or middle-click.
 - Cross-platform prebuilt native binaries for macOS, Linux, and Windows (x64 + arm64).
+
+[1.1.0]: https://github.com/shohihul/oh-my-pi-vscode/releases/tag/v1.1.0
 
 [1.0.0]: https://github.com/shohihul/oh-my-pi-vscode/releases/tag/v1.0.0
