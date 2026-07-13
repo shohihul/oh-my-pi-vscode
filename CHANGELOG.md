@@ -5,6 +5,14 @@ All notable changes to **Oh My Pi for VS Code** are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [UNRELEASED]
+
+### Added
+
+- **Find in Terminal** — search the terminal scrollback with a webview search bar: type-ahead matching, next/previous navigation (`Enter` / `Shift+Enter`), and a live match counter (`N/M`). Toggles for **Match Case**, **Match Whole Word**, and **Regular Expression**.
+- Match highlighting and the active-result counter powered by `@xterm/addon-search`, with colors resolved live from the active VS Code theme (`--vscode-editor-findMatch*` variables).
+- Open search via `Cmd/Ctrl+F` (intercepted inside the terminal so the keystroke never leaks to the shell), the **Find in Terminal** command, the search toolbar icon, or the command palette. Close with `Escape`.
+
 ## [1.0.1] - 2026-07-11
 
 ### Fixed

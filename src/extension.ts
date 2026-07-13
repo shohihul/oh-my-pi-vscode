@@ -15,6 +15,9 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand("ohMyPi.restart", () => {
       provider.restart();
     }),
+    vscode.commands.registerCommand("ohMyPi.search", () => {
+      provider.search();
+    }),
     provider,
   );
 

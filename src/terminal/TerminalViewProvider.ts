@@ -107,6 +107,10 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
     this.#restart();
   }
 
+  search(): void {
+    this.#view?.webview.postMessage({ type: "search" });
+  }
+
   dispose(): void {
     this.#clearViewDisposables();
     for (const d of this.#globalDisposables) {
