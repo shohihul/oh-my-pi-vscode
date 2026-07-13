@@ -348,6 +348,20 @@ function buildTerminalHtmlInner(
       }
     }, true);
 
+    // Shift+Enter inserts a newline in the omp composer. xterm.js hardcodes the
+    // Enter key to a bare carriage return and ignores the Shift modifier, so
+    // both Enter and Shift+Enter arrive identically and omp reads them as
+    // submit. Intercept Shift+Enter here on capture phase (where shiftKey is
+    // still observable) and inject the legacy Shift+Enter sequence that the omp
+    // editor maps to insert newline (see pi-tui editor.ts).
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        vscode.postMessage({ type: 'input', data: '\\x1b[13;2~' });
+      }
+    }, true);
+
     let ready = false;
     let exited = false;
 

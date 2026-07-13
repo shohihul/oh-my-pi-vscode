@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Match highlighting and the active-result counter powered by `@xterm/addon-search`, with colors resolved live from the active VS Code theme (`--vscode-editor-findMatch*` variables).
 - Open search via `Cmd/Ctrl+F` (intercepted inside the terminal so the keystroke never leaks to the shell), the **Find in Terminal** command, the search toolbar icon, or the command palette. Close with `Escape`.
 
+### Fixed
+
+- `Shift+Enter` now inserts a newline in the `omp` composer instead of submitting the message. xterm.js hardcodes the Enter key to a bare carriage return and ignores the Shift modifier, so both Enter and Shift+Enter arrived identically and were read as "submit". Shift+Enter is now intercepted in the webview (where the Shift modifier is still visible) and re-injected as the legacy `ESC [ 13 ; 2 ~` sequence that `omp` maps to "insert newline".
+
 ## [1.0.1] - 2026-07-11
 
 ### Fixed
