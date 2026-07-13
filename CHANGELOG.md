@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Find in Terminal** — search the terminal scrollback with a webview search bar: type-ahead matching, next/previous navigation (`Enter` / `Shift+Enter`), and a live match counter (`N/M`). Toggles for **Match Case**, **Match Whole Word**, and **Regular Expression**.
 - Match highlighting and the active-result counter powered by `@xterm/addon-search`, with colors resolved live from the active VS Code theme (`--vscode-editor-findMatch*` variables).
 - Open search via `Cmd/Ctrl+F` (intercepted inside the terminal so the keystroke never leaks to the shell), the **Find in Terminal** command, the search toolbar icon, or the command palette. Close with `Escape`.
+- Clickable links in terminal output — URLs are detected automatically by the `WebLinksAddon` and open in the system browser on click.
+- Clickable file paths in terminal output — absolute paths (`/usr/src/app.ts`), home paths (`~/config.json`), relative paths (`./src/foo.ts`, `src/foo.ts`, `../lib/bar.js`), and Windows drive paths (`C:\Users\file.ts`) are detected and open in the editor on click, with optional `:line` or `:line:col` suffix support for cursor positioning.
 
 ## [1.0.1] - 2026-07-11
 

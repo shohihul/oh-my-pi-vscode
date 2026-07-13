@@ -10,6 +10,7 @@ type XtermAssets = {
   fitJs: string;
   webglJs: string;
   searchJs: string;
+  webLinksJs: string;
 };
 
 let cachedAssets: XtermAssets | undefined;
@@ -24,6 +25,7 @@ function loadAssets(extensionPath: string): XtermAssets {
       fitJs: read("@xterm", "addon-fit", "lib", "addon-fit.js"),
       webglJs: read("@xterm", "addon-webgl", "lib", "addon-webgl.js"),
       searchJs: read("@xterm", "addon-search", "lib", "addon-search.js"),
+      webLinksJs: read("@xterm", "addon-web-links", "lib", "addon-web-links.js"),
     };
   }
   return cachedAssets;
@@ -196,6 +198,8 @@ function buildTerminalHtmlInner(
   <script nonce="${nonce}">${assets.xtermJs}</script>
   <script nonce="${nonce}">${assets.fitJs}</script>
   <script nonce="${nonce}">${assets.searchJs}</script>
+  <script nonce="${nonce}">${assets.webglJs}</script>
+  <script nonce="${nonce}">${assets.webLinksJs}</script>
   <script nonce="${nonce}">
     const vscode = acquireVsCodeApi();
     const container = document.getElementById('terminal-container');
@@ -347,6 +351,46 @@ function buildTerminalHtmlInner(
         searchInput.select();
       }
     }, true);
+    // Clickable URLs — handled by WebLinksAddon, forwarded to extension host
+    // which opens them via vscode.env.openExternal.
+    const webLinksAddon = new WebLinksAddon.WebLinksAddon((_event, uri) => {
+      vscode.postMessage({ type: 'openUrl', uri });
+    });
+    term.loadAddon(webLinksAddon);
+
+    // Clickable file paths — custom link provider that matches absolute/relative
+    // paths with optional :line:col suffix and forwards them to the extension host
+    // which opens them in the editor.
+    const FILE_PATH_RE = /(?<![:\\/\\w.])((?:[A-Za-z]:[\\\\/]|[\\/~]|\\.\\.?\\/|[\\w@-]+\\/)[^\\s\`'"<>()]+?\\.([a-zA-Z0-9]{1,16}))(?::(\\d+))?(?::(\\d+))?(?![a-zA-Z0-9.])/g;
+    term.registerLinkProvider({
+      provideLinks(lineNumber, callback) {
+        const line = term.buffer.active.getLine(lineNumber - 1);
+        if (!line) { callback(undefined); return; }
+        const text = line.translateToString(true);
+        const links = [];
+        FILE_PATH_RE.lastIndex = 0;
+        let m;
+        while ((m = FILE_PATH_RE.exec(text)) !== null) {
+          const filePath = m[1];
+          const startCol = m.index;
+          const endCol = startCol + m[0].length;
+          const lineNum = m[3] ? parseInt(m[3], 10) : undefined;
+          const colNum = m[4] ? parseInt(m[4], 10) : undefined;
+          links.push({
+            text: m[0],
+            range: {
+              start: { x: startCol + 1, y: lineNumber },
+              end: { x: endCol, y: lineNumber },
+            },
+            decorations: { pointerCursor: true, underline: true },
+            activate() {
+              vscode.postMessage({ type: 'openFile', path: filePath, line: lineNum, col: colNum });
+            },
+          });
+        }
+        callback(links.length ? links : undefined);
+      },
+    });
 
     let ready = false;
     let exited = false;
