@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Send Selection to omp** — sends the exact selected text (or the active line if nothing is selected) to the terminal, with no trailing newline.
 - **Send File Path to omp** — sends the file path relative to the workspace and presses Enter.
 - All three are reachable from the editor right-click menu and the Command Palette.
+- Clickable links in terminal output — URLs are detected automatically by the `WebLinksAddon` and open in the system browser on click.
+- Clickable file paths in terminal output — absolute paths (`/usr/src/app.ts`), home paths (`~/config.json`), relative paths (`./src/foo.ts`, `src/foo.ts`, `../lib/bar.js`), and Windows drive paths (`C:\Users\file.ts`) are detected and open in the editor on click, with optional `:line` or `:line:col` suffix support for cursor positioning.
 
 ### Fixed
 
