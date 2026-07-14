@@ -12,6 +12,7 @@ import {
 import { parseTerminalMessage } from "../messages";
 import { PtySession } from "./ptySession";
 import { buildTerminalHtml } from "./terminalHtml";
+import { IdleDetector } from "../idleDetector";
 
 export class TerminalViewProvider implements vscode.WebviewViewProvider {
   static readonly viewType = "ohMyPi.terminal";
@@ -22,12 +23,29 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
   #rows = 24;
   #spawned = false;
   #exited = false;
+  #statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+  #idleDetector = new IdleDetector({
+    minBytes: 256,
+    idleTimeoutMs: 5000,
+    onActive: () => this.#onTaskActive(),
+    onIdle: () => this.#onTaskIdle(),
+  });
+  #taskPending = false;
+  #taskDone = false;
+  #pendingTimer: NodeJS.Timeout | undefined;
+  #doneTimer: NodeJS.Timeout | undefined;
+  #lastInputAt = 0;
   #viewDisposables: vscode.Disposable[] = [];
   #globalDisposables: vscode.Disposable[] = [];
   #pendingSend: string | undefined;
 
   constructor(private readonly extensionUri: vscode.Uri) {
+    this.#statusBar.command = "ohMyPi.open";
+    this.#updateStatusBar();
+
     this.#globalDisposables.push(
+      this.#statusBar,
+      this.#idleDetector,
       vscode.window.onDidChangeActiveColorTheme(() => this.#syncAppearance()),
       vscode.workspace.onDidChangeConfiguration((e) => {
         if (
@@ -54,6 +72,7 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
     this.#pty.dispose();
     this.#resetSessionState();
     this.#view = webviewView;
+    this.#updateStatusBar();
 
     webviewView.webview.options = {
       enableScripts: true,
@@ -100,6 +119,11 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
       webviewView.onDidChangeVisibility(() => {
         if (webviewView.visible) {
           webviewView.webview.postMessage({ type: "focus" });
+          if (this.#taskDone) {
+            this.#clearDoneTimer();
+            this.#taskDone = false;
+            this.#updateStatusBar();
+          }
         }
       }),
       webviewView.onDidDispose(() => {
@@ -107,6 +131,7 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
         this.#pty.dispose();
         this.#view = undefined;
         this.#resetSessionState();
+        this.#statusBar.hide();
       }),
     );
   }
@@ -145,6 +170,8 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
 
   dispose(): void {
     this.#clearViewDisposables();
+    this.#clearPendingTimer();
+    this.#clearDoneTimer();
     for (const d of this.#globalDisposables) {
       d.dispose();
     }
@@ -176,6 +203,11 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
 
   #writeInput(data: string): void {
     this.#pty.write(data);
+    this.#lastInputAt = Date.now();
+
+    if (data.includes("\r") && this.#spawned && !this.#exited) {
+      this.#onEnterPressed();
+    }
 
     // Help recover terminal state after Ctrl+C in nested TUIs.
     if (data === "\x03") {
@@ -261,13 +293,23 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
         rows: this.#rows,
         onData: (data) => {
           this.#view?.webview.postMessage({ type: "data", data });
+          if (Date.now() - this.#lastInputAt > 500) {
+            this.#idleDetector.onData(data);
+          }
         },
         onExit: (code) => {
           this.#exited = true;
           this.#spawned = false;
+          this.#idleDetector.reset();
+          this.#clearPendingTimer();
+          this.#clearDoneTimer();
+          this.#taskPending = false;
+          this.#taskDone = false;
           this.#view?.webview.postMessage({ type: "exit", code });
+          this.#updateStatusBar();
         },
       });
+      this.#updateStatusBar();
     } catch (err) {
       this.#spawned = false;
       const message = err instanceof Error ? err.message : String(err);
@@ -276,6 +318,7 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
         type: "data",
         data: `\r\n\x1b[31mFailed to start omp: ${message}\x1b[0m\r\n`,
       });
+      this.#updateStatusBar();
     }
 
     const pending = this.#pendingSend;
@@ -289,6 +332,12 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
     this.#pty.dispose();
     this.#spawned = false;
     this.#exited = false;
+    this.#idleDetector.reset();
+    this.#clearPendingTimer();
+    this.#clearDoneTimer();
+    this.#taskPending = false;
+    this.#taskDone = false;
+    this.#updateStatusBar();
     this.#view?.webview.postMessage({ type: "clear" });
     this.#ensurePty();
   }
@@ -296,6 +345,105 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
   #resetSessionState(): void {
     this.#spawned = false;
     this.#exited = false;
+    this.#taskPending = false;
+    this.#taskDone = false;
+    this.#clearPendingTimer();
+    this.#clearDoneTimer();
+    this.#idleDetector.reset();
+  }
+
+  #updateStatusBar(): void {
+    if (this.#exited) {
+      this.#statusBar.text = "$(circle-slash) omp: Exited";
+      this.#statusBar.tooltip = "Oh My Pi — omp has exited. Click to open and press any key to restart.";
+      this.#statusBar.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
+      this.#statusBar.color = undefined;
+    } else if (!this.#spawned) {
+      this.#statusBar.text = "$(loading~spin) omp: Starting";
+      this.#statusBar.tooltip = "Oh My Pi — starting omp…";
+      this.#statusBar.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
+      this.#statusBar.color = undefined;
+    } else if (this.#idleDetector.isRunning || this.#taskPending) {
+      this.#statusBar.text = "$(sync~spin) omp: Running";
+      this.#statusBar.tooltip = "Oh My Pi — omp is processing. Click to open.";
+      this.#statusBar.backgroundColor = undefined;
+      this.#statusBar.color = new vscode.ThemeColor("terminal.ansiBrightBlue");
+    } else if (this.#taskDone) {
+      this.#statusBar.text = "$(check) omp: Done";
+      this.#statusBar.tooltip = "Oh My Pi — task completed. Click to open.";
+      this.#statusBar.backgroundColor = undefined;
+      this.#statusBar.color = new vscode.ThemeColor("terminal.ansiBrightGreen");
+    } else {
+      this.#statusBar.text = "$(terminal) omp: Ready";
+      this.#statusBar.tooltip = "Oh My Pi — omp is ready. Click to open.";
+      this.#statusBar.backgroundColor = undefined;
+      this.#statusBar.color = undefined;
+    }
+    this.#statusBar.show();
+  }
+
+  #onTaskIdle(): void {
+    this.#taskPending = false;
+    this.#clearPendingTimer();
+    this.#taskDone = true;
+    this.#updateStatusBar();
+
+    if (this.#view?.visible) {
+      this.#doneTimer = setTimeout(() => {
+        this.#doneTimer = undefined;
+        this.#taskDone = false;
+        this.#updateStatusBar();
+      }, 5000);
+    } else if (
+      vscode.workspace
+        .getConfiguration("ohMyPi")
+        .get<boolean>("notifyOnIdle", true)
+    ) {
+      void vscode.window
+        .showInformationMessage("Oh My Pi: Task completed.", "Open")
+        .then((action) => {
+          if (action === "Open") {
+            this.reveal();
+          }
+        });
+    }
+  }
+
+  #onEnterPressed(): void {
+    this.#clearDoneTimer();
+    this.#taskDone = false;
+    this.#taskPending = true;
+    this.#updateStatusBar();
+
+    this.#pendingTimer = setTimeout(() => {
+      this.#pendingTimer = undefined;
+      if (!this.#idleDetector.isRunning) {
+        this.#taskPending = false;
+        this.#updateStatusBar();
+      }
+    }, 5000);
+  }
+
+  #onTaskActive(): void {
+    this.#clearPendingTimer();
+    this.#taskPending = false;
+    this.#clearDoneTimer();
+    this.#taskDone = false;
+    this.#updateStatusBar();
+  }
+
+  #clearPendingTimer(): void {
+    if (this.#pendingTimer !== undefined) {
+      clearTimeout(this.#pendingTimer);
+      this.#pendingTimer = undefined;
+    }
+  }
+
+  #clearDoneTimer(): void {
+    if (this.#doneTimer !== undefined) {
+      clearTimeout(this.#doneTimer);
+      this.#doneTimer = undefined;
+    }
   }
 
   #clearViewDisposables(): void {

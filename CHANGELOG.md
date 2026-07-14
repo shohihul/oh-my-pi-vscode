@@ -5,6 +5,14 @@ All notable changes to **Oh My Pi for VS Code** are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Status bar indicator** — a five-state status bar shows live omp status at a glance: **Starting** (yellow), **Ready** (default), **Running** (blue), **Done** (green), and **Exited** (red). Running triggers instantly when you press Enter and confirms once output flows; Done appears when a task finishes and auto-reverts to Ready after 5 seconds (panel visible) or when you return to the panel (panel hidden). Click the status bar to reveal the terminal.
+- **Task completion notification** — when omp finishes a long-running task while the panel is hidden, a notification toast appears with an **Open** button to jump back. The status bar also turns green (Done). Detection is based on PTY output volume (256+ bytes) followed by 5 seconds of silence, which filters out typing echoes. Enabled by default; disable via `ohMyPi.notifyOnIdle`.
+
+
 ## [1.1.0] - 2026-07-14
 
 ### Added
