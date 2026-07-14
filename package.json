@@ -166,6 +166,11 @@
           "type": "string",
           "default": "",
           "markdownDescription": "Working directory for omp (defaults to the first workspace folder, or your home directory)."
+        },
+        "ohMyPi.notifyOnIdle": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a notification when a long-running omp task completes while the panel is hidden."
         }
       }
     },
