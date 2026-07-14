@@ -21,6 +21,12 @@ This extension does **not** use VS Code's built-in terminal panel. It renders it
 
 **Paste:** Cmd/Ctrl+V or middle-click.
 
+**Send code from the editor** (editor right-click menu or Command Palette):
+
+- **Send Line(s) to omp** — sends a line reference like `path/to/file.ts:20` (single line) or `path/to/file.ts:20-25` (selection range), relative to the workspace, and presses Enter.
+- **Send Selection to omp** — sends the exact selected text, or the active line if nothing is selected.
+- **Send File Path to omp** — sends the file path relative to the workspace and presses Enter.
+
 ## Settings
 
 | Setting | Default | Description |
