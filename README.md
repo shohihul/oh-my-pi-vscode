@@ -12,26 +12,43 @@ This extension does **not** use VS Code's built-in terminal panel. It renders it
 
 ## Usage
 
-1. Click the **Oh My Pi** icon in the activity bar
-2. Or run **Oh My Pi for VS Code: Open Terminal** from the Command Palette
-3. Default shortcut: **Cmd+Shift+Alt+I** (macOS) / **Ctrl+Shift+Alt+I** (Windows/Linux)
-4. Use **Oh My Pi for VS Code: Restart Terminal** (toolbar button or Command Palette) to restart `omp`
+### Opening the terminal
 
-`omp` starts when the panel opens. If it exits, press any key to restart.
+Any of these opens the panel:
 
-**Paste:** Cmd/Ctrl+V or middle-click.
+- Click the **Oh My Pi** icon in the activity bar
+- Run **Oh My Pi for VS Code: Open Terminal** from the Command Palette
+- Press **Cmd+Shift+Alt+I** (macOS) / **Ctrl+Shift+Alt+I** (Windows/Linux)
 
-**Send code from the editor** (editor right-click menu or Command Palette):
+`omp` launches as soon as the panel opens. To restart it manually, click the toolbar button or run **Restart Terminal** from the Command Palette. If `omp` exits on its own, just press any key to relaunch it.
 
-- **Send Line(s) to omp** — sends a line reference like `path/to/file.ts:20` (single line) or `path/to/file.ts:20-25` (selection range), relative to the workspace, and presses Enter.
-- **Send Selection to omp** — sends the exact selected text, or the active line if nothing is selected.
-- **Send File Path to omp** — sends the file path relative to the workspace and presses Enter.
+### Inside the terminal
+
+| Action | Shortcut |
+|--------|----------|
+| Paste | Cmd/Ctrl+V or middle-click |
+| Find | Cmd/Ctrl+F (or the search toolbar button) |
+| New line in the `omp` composer | Shift+Enter |
+
+The find bar supports case-sensitive, whole-word, and regex matching with a live result counter. Press **Enter** / **Shift+Enter** to jump to the next / previous match, and **Esc** to close.
+
+**Clickable links** — URLs open in your external browser. File paths — with an optional `:line` or `:line:col` suffix — open directly in the editor.
+
+### Sending code from the editor
+
+Available from the editor's right-click menu or the Command Palette:
+
+| Command | What it sends |
+|---------|---------------|
+| **Send Line(s) to omp** | A workspace-relative line reference like `path/to/file.ts:20` (single line) or `path/to/file.ts:20-25` (selection range), then Enter. |
+| **Send Selection to omp** | The exact selected text — or the active line if nothing is selected. |
+| **Send File Path to omp** | The workspace-relative file path, then Enter. |
 
 ## Settings
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `ohMyPi.executablePath` | `omp` | Command to run. Use a full path if `omp` is not on VS Code's PATH. |
+| `ohMyPi.executablePath` | `omp` | Command to run. Use a full path if `omp` is not on VS Code's PATH. Shell arguments are supported (e.g. `omp --flag`). |
 | `ohMyPi.autoStart` | `false` | Open the panel automatically when VS Code starts. |
 | `ohMyPi.workingDirectory` | workspace / home | Working directory passed to `omp`. Invalid paths fall back to home. |
 
@@ -53,7 +70,7 @@ Set the full path in settings:
 }
 ```
 
-`omp` runs via a login shell (`$SHELL -l -c`) so your shell profile PATH is loaded on macOS/Linux.
+On macOS/Linux, `omp` runs via a login shell (`$SHELL -l -c`) so your shell profile PATH is loaded. On Windows it launches through PowerShell 7 (`pwsh`), falling back to Windows PowerShell, then `cmd.exe`.
 
 **Blank panel**
 
@@ -76,7 +93,7 @@ Press **F5** in VS Code to launch an Extension Development Host.
 ## Architecture
 
 ```
-Activity Bar → Webview (xterm.js + WebGL) ↔ Extension Host ↔ node-pty → omp
+Activity Bar → Webview (xterm.js + WebGL) ↔ Extension Host ↔ @lydell/node-pty → omp
 ```
 
 ## License
