@@ -4,6 +4,16 @@ Embedded terminal panel for [Oh My Pi](https://github.com/can1357/oh-my-pi). Run
 
 This extension does **not** use VS Code's built-in terminal panel. It renders its own terminal inside a webview.
 
+## Preview
+
+**Embedded sidebar terminal running omp**
+
+![Terminal panel](docs/images/panel.png)
+
+**Send line of code from the editor**
+
+![Send Selection to omp](docs/images/send-line.png)
+
 ## Requirements
 
 - VS Code 1.85+ (desktop — macOS, Linux, or Windows)
