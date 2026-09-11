@@ -49,6 +49,7 @@ Available from the editor's right-click menu or the Command Palette:
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `ohMyPi.executablePath` | `omp` | Command to run. Use a full path if `omp` is not on VS Code's PATH. Shell arguments are supported (e.g. `omp --flag`). |
+| `ohMyPi.profile` | *(empty)* | OMP profile to run (e.g. `work`). Set it per workspace in `.vscode/settings.json` so each repo can use its own agent profile. A `--profile` flag in `ohMyPi.executablePath` takes precedence. |
 | `ohMyPi.autoStart` | `false` | Open the panel automatically when VS Code starts. |
 | `ohMyPi.workingDirectory` | workspace / home | Working directory passed to `omp`. Invalid paths fall back to home. |
 
@@ -56,7 +57,17 @@ Font size and family follow `terminal.integrated.fontSize` and `terminal.integra
 
 Terminal colors (background, foreground, cursor, selection, and all 16 ANSI colors) are read from your active VS Code theme via `--vscode-terminal-*` CSS variables — they update automatically when you switch themes.
 
-Changing `executablePath` or `workingDirectory` restarts the terminal automatically.
+Changing `executablePath`, `profile`, or `workingDirectory` restarts the terminal automatically.
+
+### Per-workspace profile
+
+Pin an OMP profile for a specific repository with workspace settings:
+
+```json
+{ "ohMyPi.profile": "work" }
+```
+
+The value is passed to `omp` as the `OMP_PROFILE` environment variable, so it also works with wrapper executables. An explicit `--profile` flag in `ohMyPi.executablePath` wins over this setting; when empty, the inherited environment is used unchanged.
 
 ## Troubleshooting
 

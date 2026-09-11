@@ -6,6 +6,7 @@ import * as vscode from "vscode";
 
 import {
   getExecutable,
+  getProfile,
   getTerminalFont,
   resolveWorkingDirectory,
 } from "../config";
@@ -32,6 +33,7 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
       vscode.workspace.onDidChangeConfiguration((e) => {
         if (
           e.affectsConfiguration("ohMyPi.executablePath") ||
+          e.affectsConfiguration("ohMyPi.profile") ||
           e.affectsConfiguration("ohMyPi.workingDirectory")
         ) {
           this.restart();
@@ -256,6 +258,7 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
     try {
       this.#pty.spawn({
         executable: getExecutable(),
+        profile: getProfile(),
         cwd: resolveWorkingDirectory(),
         cols: this.#cols,
         rows: this.#rows,

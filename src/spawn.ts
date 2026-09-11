@@ -29,7 +29,7 @@ function buildWindowsSpawnCommand(executable: string): { file: string; args: str
   return { file: "powershell.exe", args: ["-NoLogo", "-Command", executable] };
 }
 
-export function buildPtyEnv(): Record<string, string> {
+export function buildPtyEnv(profile = ""): Record<string, string> {
   const env: Record<string, string> = {
     ...(process.env as Record<string, string>),
     TERM: "xterm-256color",
@@ -37,6 +37,9 @@ export function buildPtyEnv(): Record<string, string> {
     LANG: "C.UTF-8",
     LC_ALL: "C.UTF-8",
   };
+  if (profile) {
+    env.OMP_PROFILE = profile;
+  }
   delete env.ELECTRON_RUN_AS_NODE;
   delete env.ELECTRON_NO_ASAR;
   return env;

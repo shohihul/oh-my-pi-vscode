@@ -4,6 +4,7 @@ import { buildPtyEnv, buildSpawnCommand } from "../spawn";
 
 export type PtySessionOptions = {
   executable: string;
+  profile: string;
   cwd: string;
   cols: number;
   rows: number;
@@ -26,7 +27,7 @@ export class PtySession {
       cols: opts.cols,
       rows: opts.rows,
       cwd: opts.cwd,
-      env: buildPtyEnv(),
+      env: buildPtyEnv(opts.profile),
     });
 
     this.#dataDisposable = this.#proc.onData(opts.onData);

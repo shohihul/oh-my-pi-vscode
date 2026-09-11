@@ -43,4 +43,14 @@ describe("buildPtyEnv", () => {
     assert.equal(env.ELECTRON_RUN_AS_NODE, undefined);
     assert.equal(env.ELECTRON_NO_ASAR, undefined);
   });
+
+  it("sets OMP_PROFILE when a profile is given", () => {
+    const env = buildPtyEnv("martha");
+    assert.equal(env.OMP_PROFILE, "martha");
+  });
+
+  it("leaves the inherited OMP_PROFILE untouched when no profile is set", () => {
+    const env = buildPtyEnv("");
+    assert.equal(env.OMP_PROFILE, process.env.OMP_PROFILE);
+  });
 });

@@ -2,7 +2,7 @@
   "name": "oh-my-pi-vscode",
   "displayName": "Oh My Pi for VS Code",
   "description": "Oh My Pi for VS Code — embedded terminal panel that runs omp in a dedicated sidebar (desktop only).",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "publisher": "shohihulmaksud",
   "icon": "oh-my-pi-vscode-logo.png",
   "license": "MIT",
@@ -156,6 +156,11 @@
           "type": "string",
           "default": "",
           "markdownDescription": "Command to run in the embedded terminal. Defaults to `omp`. Use a full path if `omp` is not on VS Code's PATH (e.g. `~/.bun/bin/omp`). Shell arguments are supported (e.g. `omp --flag`)."
+        },
+        "ohMyPi.profile": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "OMP profile for this workspace (e.g. `work`). Passed to omp as the `OMP_PROFILE` environment variable, so it works even with a wrapper executable. Leave empty to use the inherited environment. An explicit `--profile` flag in `#ohMyPi.executablePath#` takes precedence."
         },
         "ohMyPi.autoStart": {
           "type": "boolean",

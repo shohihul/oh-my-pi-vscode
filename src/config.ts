@@ -10,6 +10,11 @@ export function getExecutable(): string {
   return value || "omp";
 }
 
+export function getProfile(): string {
+  const config = vscode.workspace.getConfiguration("ohMyPi");
+  return config.get<string>("profile")?.trim() || "";
+}
+
 function getWorkingDirectory(): string {
   const config = vscode.workspace.getConfiguration("ohMyPi");
   const configured = config.get<string>("workingDirectory")?.trim();

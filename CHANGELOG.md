@@ -5,6 +5,12 @@ All notable changes to **Oh My Pi for VS Code** are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-09-11
+
+### Added
+
+- `ohMyPi.profile` setting — runs the embedded terminal under a specific OMP profile by setting `OMP_PROFILE` for the spawned `omp`. Works per workspace (`.vscode/settings.json`), so each repository can use its own agent profile. An explicit `--profile` flag in `ohMyPi.executablePath` still takes precedence; an empty value leaves the inherited environment unchanged.
+
 ## [1.1.0] - 2026-07-14
 
 ### Added
@@ -45,6 +51,8 @@ First stable release.
 - Auto-restart on exit (press any key); automatic restart when `executablePath` or `workingDirectory` changes.
 - Paste via `Cmd/Ctrl+V` or middle-click.
 - Cross-platform prebuilt native binaries for macOS, Linux, and Windows (x64 + arm64).
+
+[1.2.0]: https://github.com/shohihul/oh-my-pi-vscode/releases/tag/v1.2.0
 
 [1.1.0]: https://github.com/shohihul/oh-my-pi-vscode/releases/tag/v1.1.0
 
