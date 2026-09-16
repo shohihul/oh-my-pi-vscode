@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
   <defs>
     <linearGradient id="mark" x1="2" y1="3" x2="18" y2="21" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FF2DBD"/>
-      <stop offset="0.52" stop-color="#9B42EF"/>
-      <stop offset="1" stop-color="#00D5F5"/>
+      <stop offset="0" stop-color="#D90A9B"/>
+      <stop offset="0.52" stop-color="#7534D6"/>
+      <stop offset="1" stop-color="#008EB8"/>
     </linearGradient>
   </defs>
-  <path fill="url(#mark)" stroke="#FFFFFF" stroke-opacity="0.24" stroke-width="0.35" stroke-linejoin="round" d="M1.5 3h21v4.5h-5.2V21H13V7.5h-2.5v6.7H6.2V7.5H1.5Z"/>
-  <g fill="#A247EE">
+  <path fill="url(#mark)" stroke="#312E4F" stroke-opacity="0.28" stroke-width="0.35" stroke-linejoin="round" d="M1.5 3h21v4.5h-5.2V21H13V7.5h-2.5v6.7H6.2V7.5H1.5Z"/>
+  <g fill="#6935CC">
     <path opacity="0.95" d="M6.2 14.55h.7v.7h-.7zm1.1 0H8v.7h-.7zm1.1 0h.7v.7h-.7zm1.1 0h.7v.7h-.7z"/>
     <path opacity="0.78" d="M6.2 15.65h.7v.7h-.7zm1.1 0H8v.7h-.7zm1.1 0h.7v.7h-.7zm1.1 0h.7v.7h-.7z"/>
     <path opacity="0.58" d="M6.2 16.75h.7v.7h-.7zm1.1 0H8v.7h-.7zm1.1 0h.7v.7h-.7zm1.1 0h.7v.7h-.7z"/>

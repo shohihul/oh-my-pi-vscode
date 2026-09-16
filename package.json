@@ -64,7 +64,10 @@
         "command": "ohMyPi.open",
         "title": "Oh My Pi for VS Code: Open Terminal",
         "category": "Oh My Pi for VS Code",
-        "icon": "$(terminal)"
+        "icon": {
+          "light": "media/editor-title-icon-light.svg",
+          "dark": "media/editor-title-icon-dark.svg"
+        }
       },
       {
         "command": "ohMyPi.restart",
@@ -107,6 +110,12 @@
         {
           "command": "ohMyPi.restart",
           "when": "view == ohMyPi.terminal",
+          "group": "navigation"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "ohMyPi.open",
           "group": "navigation"
         }
       ],
