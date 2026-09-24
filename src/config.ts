@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as vscode from "vscode";
 
-import { DEFAULT_TERMINAL_FONT, type TerminalFont } from "./appearance";
+import { resolveTerminalFont, type TerminalFont } from "./appearance";
 
 export function getExecutable(): string {
   const config = vscode.workspace.getConfiguration("ohMyPi");
@@ -40,9 +40,18 @@ export function resolveWorkingDirectory(): string {
 }
 
 export function getTerminalFont(): TerminalFont {
-  const config = vscode.workspace.getConfiguration("terminal.integrated");
-  return {
-    family: config.get<string>("fontFamily") || DEFAULT_TERMINAL_FONT.family,
-    size: config.get<number>("fontSize") ?? DEFAULT_TERMINAL_FONT.size,
-  };
+  const ohMyPi = vscode.workspace.getConfiguration("ohMyPi");
+  const terminal = vscode.workspace.getConfiguration("terminal.integrated");
+  const editor = vscode.workspace.getConfiguration("editor");
+
+  return resolveTerminalFont({
+    fontFamily: ohMyPi.get<string>("fontFamily"),
+    fontSize: ohMyPi.get<number>("fontSize"),
+    terminalFontFamily: terminal.get<string>("fontFamily"),
+    terminalFontSize: terminal.get<number>("fontSize"),
+    // VS Code's integrated terminal falls back to the editor font before the
+    // platform monospace stack; match that so the panel looks like the
+    // built-in terminal instead of whatever the OS calls "monospace".
+    editorFontFamily: editor.get<string>("fontFamily"),
+  });
 }
