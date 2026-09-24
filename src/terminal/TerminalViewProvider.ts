@@ -38,8 +38,11 @@ export class TerminalViewProvider implements vscode.WebviewViewProvider {
         ) {
           this.restart();
         } else if (
+          e.affectsConfiguration("ohMyPi.fontFamily") ||
+          e.affectsConfiguration("ohMyPi.fontSize") ||
           e.affectsConfiguration("terminal.integrated.fontFamily") ||
-          e.affectsConfiguration("terminal.integrated.fontSize")
+          e.affectsConfiguration("terminal.integrated.fontSize") ||
+          e.affectsConfiguration("editor.fontFamily")
         ) {
           this.#syncAppearance();
         }
