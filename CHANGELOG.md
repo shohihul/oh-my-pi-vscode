@@ -5,6 +5,17 @@ All notable changes to **Oh My Pi for VS Code** are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- WSL and other remote windows (Remote-SSH, Dev Containers) now launch `omp` on the remote machine instead of the local host. The extension now runs in the workspace extension host (`extensionKind: ["workspace"]`), so `omp`, its working directory, and clickable file paths all resolve inside WSL. Install the extension in WSL when VS Code prompts.
+- **Send File Path to omp** is now available for files opened in remote windows.
+
+### Changed
+
+- `ohMyPi.executablePath` and `ohMyPi.workingDirectory` are now machine-specific (`machine-overridable`): values in local User settings no longer leak into remote windows. Set them in Remote or workspace settings.
+
 ## [1.3.0] - 2026-09-16
 
 ### Added

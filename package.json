@@ -11,7 +11,7 @@
     "url": "https://github.com/shohihul/oh-my-pi-vscode"
   },
   "extensionKind": [
-    "ui"
+    "workspace"
   ],
   "engines": {
     "vscode": "^1.85.0"
@@ -132,7 +132,7 @@
         },
         {
           "command": "ohMyPi.sendFile",
-          "when": "resourceScheme == file",
+          "when": "resourceScheme == file || resourceScheme == vscode-remote",
           "group": "9_omp@3"
         }
       ],
@@ -154,7 +154,7 @@
         },
         {
           "command": "ohMyPi.sendFile",
-          "when": "resourceScheme == file"
+          "when": "resourceScheme == file || resourceScheme == vscode-remote"
         }
       ]
     },
@@ -164,7 +164,8 @@
         "ohMyPi.executablePath": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Command to run in the embedded terminal. Defaults to `omp`. Use a full path if `omp` is not on VS Code's PATH (e.g. `~/.bun/bin/omp`). Shell arguments are supported (e.g. `omp --flag`)."
+          "scope": "machine-overridable",
+          "markdownDescription": "Command to run in the embedded terminal. Defaults to `omp`. Use a full path if `omp` is not on VS Code's PATH (e.g. `~/.bun/bin/omp`). Shell arguments are supported (e.g. `omp --flag`). In a remote window (WSL, SSH, Dev Containers) this resolves on the remote machine, so set it in Remote settings rather than local User settings."
         },
         "ohMyPi.profile": {
           "type": "string",
@@ -179,6 +180,7 @@
         "ohMyPi.workingDirectory": {
           "type": "string",
           "default": "",
+          "scope": "machine-overridable",
           "markdownDescription": "Working directory for omp (defaults to the first workspace folder, or your home directory)."
         }
       }

@@ -17,8 +17,17 @@ This extension does **not** use VS Code's built-in terminal panel. It renders it
 ## Requirements
 
 - VS Code 1.85+ (desktop — macOS, Linux, or Windows)
-- `omp` installed and available, or configured via settings
+- `omp` installed and available, or configured via settings — on the remote machine when using [remote development](#remote-development-wsl-ssh-dev-containers)
 - Not supported in VS Code for the Web
+
+## Remote development (WSL, SSH, Dev Containers)
+
+The extension runs where your workspace lives. In a WSL window, `omp` is launched inside WSL — not on the Windows host — with the WSL workspace folder as its working directory. The same applies to Remote-SSH and Dev Containers.
+
+1. Install `omp` inside WSL (or on the remote machine) by following the [Oh My Pi](https://github.com/can1357/oh-my-pi) install instructions there.
+2. Install the extension in the remote: in the Extensions view, click **Install in WSL: \<distro\>** on **Oh My Pi for VS Code**. VS Code installs the Linux build there automatically.
+
+`ohMyPi.executablePath` and `ohMyPi.workingDirectory` are machine-specific: a value in your local User settings (e.g. a Windows path) is not applied in remote windows. Set them in **Remote settings** (`Preferences: Open Remote Settings`) or in workspace settings instead.
 
 ## Usage
 
@@ -91,7 +100,11 @@ Set the full path in settings:
 }
 ```
 
-On macOS/Linux, `omp` runs via a login shell (`$SHELL -l -c`) so your shell profile PATH is loaded. On Windows it launches through PowerShell 7 (`pwsh`), falling back to Windows PowerShell, then `cmd.exe`.
+On macOS/Linux, `omp` runs via a login shell (`$SHELL -l -c`) so your shell profile PATH is loaded. On Windows it launches through PowerShell 7 (`pwsh`), falling back to Windows PowerShell, then `cmd.exe`. In a WSL window it runs through your WSL login shell, so `omp` must be on the PATH inside WSL.
+
+**WSL window still starts the Windows `omp`**
+
+The extension is installed only on the Windows side. Install it in WSL from the Extensions view (**Install in WSL**) and reload the window.
 
 **Blank panel**
 
