@@ -171,6 +171,17 @@
           "default": "",
           "markdownDescription": "OMP profile for this workspace (e.g. `work`). Passed to omp as the `OMP_PROFILE` environment variable, so it works even with a wrapper executable. Leave empty to use the inherited environment. An explicit `--profile` flag in `#ohMyPi.executablePath#` takes precedence."
         },
+        "ohMyPi.fontFamily": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Font family for the embedded terminal. Leave empty to inherit `#terminal.integrated.fontFamily#`, then `#editor.fontFamily#`, then the platform monospace default (the same order VS Code's built-in terminal uses). A generic `monospace` fallback is always appended."
+        },
+        "ohMyPi.fontSize": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "markdownDescription": "Font size in pixels for the embedded terminal. `0` inherits `#terminal.integrated.fontSize#` (then 14)."
+        },
         "ohMyPi.autoStart": {
           "type": "boolean",
           "default": false,

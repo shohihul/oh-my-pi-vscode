@@ -104,6 +104,15 @@ function buildTerminalHtmlInner(
   nonce: string,
   font: { family: string; size: number },
 ): string {
+  // A font family such as `</script>` would close the inline script block early.
+  // Escaping every `<` keeps the value a valid JS string literal (no double
+  // escaping of quotes) while never emitting a literal `</script>` in the HTML.
+  const fontFamily = JSON.stringify(font.family).replace(/</g, "\\u003c");
+  // Never interpolate a non-finite/negative size — `fontSize: NaN` is a syntax
+  // error in the inline script and blanks the whole terminal.
+  const fontSize =
+    Number.isFinite(font.size) && font.size > 0 ? font.size : 14;
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -207,8 +216,8 @@ function buildTerminalHtmlInner(
     const term = new Terminal({
       allowProposedApi: true,
       cursorBlink: true,
-      fontSize: ${font.size},
-      fontFamily: ${JSON.stringify(font.family)},
+      fontSize: ${fontSize},
+      fontFamily: ${fontFamily},
       scrollback: 10000,
     });
 

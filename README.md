@@ -62,8 +62,10 @@ Available from the editor's right-click menu or the Command Palette:
 | `ohMyPi.profile` | *(empty)* | OMP profile to run (e.g. `work`). Set it per workspace in `.vscode/settings.json` so each repo can use its own agent profile. A `--profile` flag in `ohMyPi.executablePath` takes precedence. |
 | `ohMyPi.autoStart` | `false` | Open the panel automatically when VS Code starts. |
 | `ohMyPi.workingDirectory` | workspace / home | Working directory passed to `omp`. Invalid paths fall back to home. |
+| `ohMyPi.fontFamily` | *(inherited)* | Font family for the panel. Empty inherits `terminal.integrated.fontFamily`, then `editor.fontFamily`, then the platform monospace default. |
+| `ohMyPi.fontSize` | `0` | Font size in pixels. `0` inherits `terminal.integrated.fontSize`, then 14. |
 
-Font size and family follow `terminal.integrated.fontSize` and `terminal.integrated.fontFamily`.
+Font family and size resolve in the same order VS Code's built-in terminal uses: `ohMyPi.fontFamily` / `ohMyPi.fontSize` → `terminal.integrated.fontFamily` / `terminal.integrated.fontSize` → `editor.fontFamily` → platform default (`Consolas, 'Courier New', monospace` on Windows, `Menlo, Monaco, 'Courier New', monospace` on macOS, `'Droid Sans Mono', monospace` on Linux). A generic `monospace` fallback is always appended, so box-drawing characters and Nerd Font glyphs keep a 1-cell advance. Changes apply live without restarting the terminal.
 
 Terminal colors (background, foreground, cursor, selection, and all 16 ANSI colors) are read from your active VS Code theme via `--vscode-terminal-*` CSS variables — they update automatically when you switch themes.
 
